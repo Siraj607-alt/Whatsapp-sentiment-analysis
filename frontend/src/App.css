@@ -1,0 +1,326 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(to bottom, #eef5ff, #ffffff);
+  color: #333;
+}
+
+section {
+  padding: 80px 60px;
+}
+
+/* ABOUT SECTION */
+.about-section {
+  text-align: center;
+}
+
+.subtitle {
+  max-width: 700px;
+  margin: 20px auto;
+  font-size: 18px;
+  color: #555;
+}
+
+.about-features {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 50px;
+}
+
+.feature-card {
+  background: #fff;
+  padding: 30px;
+  width: 280px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.feature-card img {
+  width: 120px;
+  margin-bottom: 20px;
+}
+
+/* ANALYZER SECTION */
+.analyzer-section {
+  background: linear-gradient(to bottom, #eef5ff, #ffffff);
+  text-align: center;
+  padding-bottom: 140px;
+}
+
+
+
+.upload-box {
+  margin: 30px 0;
+}
+
+button {
+  margin-left: 15px;
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #4f7cff;
+  color: white;
+  cursor: pointer;
+}
+
+.sentiment-cards {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 40px 0;
+}
+
+.sentiment-card {
+  background: linear-gradient(to bottom, #eef5ff, #ffffff);
+  width: 180px;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.sentiment-card img {
+  width: 60px;
+  margin-bottom: 10px;
+}
+
+.mood span {
+  color: #4f7cff;
+}
+.percent {
+  font-size: 13px;
+  color: #666;
+}
+.health-score {
+  margin: 30px auto;
+  width: 200px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #f5f7ff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.health-score .score {
+  font-size: 28px;
+  font-weight: bold;
+  color: #4f7cff;
+}
+.worst-section {
+  margin-top: 50px;
+  background: linear-gradient(to bottom, #eef5ff, #ffffff);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.worst-section h3 {
+  color: #c62828;
+  margin-bottom: 20px;
+}
+
+.worst-list {
+  list-style: none;
+  padding: 0;
+}
+
+.worst-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #f3caca;
+  display: flex;
+  flex-direction: column;
+}
+
+.worst-text {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+.confidence {
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
+}
+.footer {
+  margin-top: 80px;
+  padding: 30px 0;
+  text-align: center;
+  background: #f1f5ff;
+  color: #555;
+  font-size: 14px;
+}
+
+.footer-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #777;
+}
+/* 🔴 Negative Messages Soft Box */
+.negative-section {
+  margin-top: 50px;
+  padding: 28px 32px;
+  background: #fff6f6;               /* soft red tint */
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.negative-title {
+  color: #c62828;
+  margin-bottom: 18px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.negative-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.negative-item {
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: #ffffff;
+  border-radius: 10px;
+  color: #d32f2f;
+  font-size: 15px;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+/* 📁 Professional Upload Card */
+.upload-card {
+  display: block;
+  margin: 30px auto 10px;
+  max-width: 480px;
+  padding: 22px;
+  border: 2px dashed #b7c6ff;
+  border-radius: 16px;
+  background: #f8faff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.upload-card:hover {
+  background: #eef3ff;
+  border-color: #4f7cff;
+}
+
+.upload-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.upload-icon {
+  font-size: 32px;
+}
+
+.upload-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.upload-sub {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+}
+/* 🌈 Overall Mood Badge */
+.mood {
+  margin-top: 30px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.mood-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* mood colors */
+.mood-badge.positive {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.mood-badge.neutral {
+  background: #fff8e1;
+  color: #f57c00;
+}
+
+.mood-badge.negative {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.mood-icon {
+  width: 20px;
+  height: 20px;
+}
+/* ✨ About Section Card Hover Animation */
+
+.feature-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: 
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  cursor: default;
+}
+
+/* Hover effect */
+.feature-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* SVG / image animation */
+.feature-card img {
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover img {
+  transform: translateY(-6px);
+}
+.health-section {
+  margin: 50px auto;
+  text-align: center;
+}
+
+.health-chart {
+  position: relative;
+  width: 220px;
+  margin: 0 auto;
+}
+
+.health-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 700;
+}
+
+.health-number {
+  font-size: 32px;
+  color: #333;
+}
+
+.health-total {
+  font-size: 16px;
+  color: #666;
+}

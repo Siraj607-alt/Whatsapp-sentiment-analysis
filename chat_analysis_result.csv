@@ -1,0 +1,4 @@
+message,sentiment,confidence
+Today was amazing,Positive,0.58
+Worst day ever,Negative,0.85
+Okay fine,Positive,0.94
