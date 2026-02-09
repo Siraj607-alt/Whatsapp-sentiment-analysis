@@ -38,20 +38,35 @@ def clean_text(text):
 def extract_whatsapp_messages(lines):
     messages = []
 
-    pattern = re.compile(
-        r"^\[.*?\]\s.*?:\s(.*)$"
+    SYSTEM_PHRASES = (
+        "messages and calls are end-to-end encrypted",
+        "end-to-end encrypted",
+        "is a contact",
+        "you deleted this message",
     )
 
     for line in lines:
-        # skip encryption/system lines
-        if "end-to-end encrypted" in line.lower():
+        line = line.strip()
+        if not line:
             continue
 
-        match = pattern.match(line)
-        if match:
-            msg = match.group(1).strip()
-            if msg and "<Media omitted>" not in msg:
-                messages.append(msg)
+        lower = line.lower()
+        if any(p in lower for p in SYSTEM_PHRASES):
+            continue
+
+        # WhatsApp message = everything after FIRST colon
+        if ":" not in line:
+            continue
+
+        message = line.split(":", 1)[1].strip()
+
+        if not message:
+            continue
+
+        if "<media omitted>" in message.lower():
+            continue
+
+        messages.append(message)
 
     return messages
 
@@ -59,20 +74,44 @@ def extract_whatsapp_messages(lines):
 def home():
     return {"message": "WhatsApp Sentiment Analysis API is running"}
 
+from fastapi import UploadFile, File
+import chardet
+import unicodedata
+
 @app.post("/analyze")
 async def analyze_chat(file: UploadFile = File(...)):
-    content = await file.read()
-    text = content.decode("utf-8", errors="ignore")
-    lines = text.splitlines()
+    # 🔹 Read raw bytes
+    raw = await file.read()
 
+    # 🔹 Detect encoding (Android = UTF-16, iOS = UTF-8)
+    detected = chardet.detect(raw)
+    encoding = detected.get("encoding") or "utf-8"
+
+    try:
+        text = raw.decode(encoding)
+    except Exception:
+        text = raw.decode("utf-8", errors="ignore")
+
+    # 🔹 Normalize unicode (Android fix)
+    text = unicodedata.normalize("NFKC", text)
+    text = text.replace("\u202f", " ").replace("\u00a0", " ")
+
+    lines = text.splitlines()
+    
+
+    # 🔹 Extract messages (your existing logic)
     messages = extract_whatsapp_messages(lines)
+    
+
     if not messages:
         return {
             "error": "No valid WhatsApp messages found. Please upload a valid chat export."
         }
-    clean_msgs = [clean_text(m) for m in messages]
 
+    # 🔹 Clean + Vectorize
+    clean_msgs = [clean_text(m) for m in messages]
     vectors = vectorizer.transform(clean_msgs)
+
     probs = model.predict_proba(vectors)
     classes = model.classes_
 
@@ -94,10 +133,10 @@ async def analyze_chat(file: UploadFile = File(...)):
         results.append({
             "message": msg,
             "sentiment": sentiment,
-            "confidence": round(prob_dict[sentiment], 2)
+            "confidence": round(prob_dict.get(sentiment, max(prob)), 2)
         })
 
-        # ✅ TOTAL MESSAGES
+    # ✅ TOTAL MESSAGES
     total = sum(counts.values())
 
     # ✅ SENTIMENT PERCENTAGES
@@ -120,7 +159,7 @@ async def analyze_chat(file: UploadFile = File(...)):
         )
     )
 
-    # ✅ TOP 3 NEGATIVE MESSAGES (BY CONFIDENCE)
+    # ✅ TOP 3 NEGATIVE MESSAGES
     top_negative = sorted(
         [r for r in results if r["sentiment"] == "Negative"],
         key=lambda x: x["confidence"],
@@ -135,4 +174,3 @@ async def analyze_chat(file: UploadFile = File(...)):
         "health_score": health_score,
         "top_negative_messages": top_negative
     }
-

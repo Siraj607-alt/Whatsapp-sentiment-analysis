@@ -5,3 +5,5 @@ numpy
 pandas
 nltk
 python-multipart
+chardet
+

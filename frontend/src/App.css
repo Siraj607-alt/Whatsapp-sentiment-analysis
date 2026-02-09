@@ -324,3 +324,66 @@ button {
   font-size: 16px;
   color: #666;
 }
+/* 📱 Mobile responsiveness */
+@media (max-width: 768px) {
+  .about-features {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .about-content h1 {
+    font-size: 28px;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    text-align: center;
+  }
+}
+@media (max-width: 768px) {
+  .upload-card {
+    max-width: 100%;
+    padding: 18px;
+  }
+
+  .upload-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .upload-icon {
+    font-size: 28px;
+  }
+}
+@media (max-width: 768px) {
+  .sentiment-cards {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sentiment-card {
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .health-chart {
+    width: 180px;
+  }
+
+  .volatility-card {
+    padding: 20px;
+    margin: 30px 10px;
+  }
+}
+@media (max-width: 768px) {
+  .negative-section {
+    padding: 20px;
+    margin: 30px 10px;
+  }
+
+  .negative-item {
+    font-size: 14px;
+  }
+}
+

@@ -14,7 +14,7 @@ export default function AnalyzerSection() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(""); // ✅ NEW
 
-  const API_URL = "http://127.0.0.1:8000/analyze";
+  const API_URL = "https://whatsapp-sentiment-analysis-65t5.onrender.com/analyze";
   const getMoodColor = (mood) => {
     if (mood === "Positive") return "#4CAF50";
     if (mood === "Negative") return "#F44336";
