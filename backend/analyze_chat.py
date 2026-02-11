@@ -1,21 +1,30 @@
 import re
 import pickle
-import pandas as pd
-import unicodedata
 import chardet
-
+import unicodedata
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 import nltk
 
-# ===============================
-# APP SETUP
-# ===============================
-app = FastAPI()
+# 🔥 Download stopwords (Render safe)
+nltk.download("stopwords")
 
+# ===============================
+# LOAD MODEL (SIMPLE VERSION)
+# ===============================
+model = pickle.load(open("sentiment_logistic.pkl", "rb"))
+vectorizer = pickle.load(open("tfidf_logistic.pkl", "rb"))
+
+stop_words = set(stopwords.words("english"))
+stemmer = PorterStemmer()
+
+app = FastAPI(title="WhatsApp Sentiment Analysis API")
+
+# ===============================
+# CORS
+# ===============================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,21 +33,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-nltk.download("stopwords")
-
 # ===============================
-# LOAD MODEL
+# CLEAN TEXT
 # ===============================
-model = pickle.load(open("sentiment_logistic.pkl", "rb"))
-vectorizer = pickle.load(open("tfidf_logistic.pkl", "rb"))
-
-stop_words = set(stopwords.words("english"))
-stemmer = PorterStemmer()
-
-# ===============================
-# TEXT CLEANING (TRAINING SAME)
-# ===============================
-def clean_text(text: str) -> str:
+def clean_text(text):
     text = text.lower()
     text = re.sub(r"http\S+", "", text)
     text = re.sub(r"[^a-zA-Z\s]", "", text)
@@ -47,30 +45,8 @@ def clean_text(text: str) -> str:
     return " ".join(words)
 
 # ===============================
-# FILE READER (ANDROID + IOS)
+# FIXED WHATSAPP EXTRACTOR
 # ===============================
-def read_uploaded_file(upload_file: UploadFile):
-    raw = upload_file.file.read()
-
-    detected = chardet.detect(raw)
-    encoding = detected.get("encoding") or "utf-8"
-
-    try:
-        text = raw.decode(encoding)
-    except Exception:
-        text = raw.decode("utf-8", errors="ignore")
-
-    # Normalize Android unicode
-    text = unicodedata.normalize("NFKC", text)
-    text = text.replace("\u202f", " ").replace("\u00a0", " ")
-
-    return text.splitlines()
-
-# ===============================
-# UNIVERSAL WHATSAPP EXTRACTOR
-# ===============================
-import unicodedata
-
 def extract_whatsapp_messages(lines):
     messages = []
 
@@ -81,10 +57,8 @@ def extract_whatsapp_messages(lines):
         "you deleted this message",
     )
 
-    # WhatsApp Android + iOS regex
-    pattern = re.compile(
-        r"^\[?.*?\]?\s?-?\s?.*?:\s(.*)$"
-    )
+    # ✅ Correct regex extractor
+    pattern = re.compile(r"^\[?.*?\]?\s?-?\s?.*?:\s(.*)$")
 
     for line in lines:
         line = line.strip()
@@ -100,7 +74,6 @@ def extract_whatsapp_messages(lines):
         if match:
             message = match.group(1).strip()
 
-            # remove empty or junk messages
             if len(message) < 2:
                 continue
 
@@ -111,24 +84,42 @@ def extract_whatsapp_messages(lines):
 
     return messages
 
+# ===============================
+# HOME
+# ===============================
+@app.get("/")
+def home():
+    return {"message": "WhatsApp Sentiment Analysis API is running"}
 
 # ===============================
-# API ENDPOINT
+# ANALYZE CHAT
 # ===============================
 @app.post("/analyze")
 async def analyze_chat(file: UploadFile = File(...)):
-    lines = read_uploaded_file(file)
+    raw = await file.read()
 
+    detected = chardet.detect(raw)
+    encoding = detected.get("encoding") or "utf-8"
+
+    try:
+        text = raw.decode(encoding)
+    except Exception:
+        text = raw.decode("utf-8", errors="ignore")
+
+    text = unicodedata.normalize("NFKC", text)
+    text = text.replace("\u202f", " ").replace("\u00a0", " ")
+
+    lines = text.splitlines()
     messages = extract_whatsapp_messages(lines)
-
-    # DEBUG (remove after confirmation)
-    print("Extracted messages:", len(messages))
 
     if not messages:
         return {
             "error": "No valid WhatsApp messages found. Please upload a valid chat export."
         }
 
+    # ===============================
+    # VECTORIZE + PREDICT
+    # ===============================
     clean_msgs = [clean_text(m) for m in messages]
     vectors = vectorizer.transform(clean_msgs)
 
@@ -141,12 +132,8 @@ async def analyze_chat(file: UploadFile = File(...)):
     for msg, prob in zip(messages, probs):
         prob_dict = dict(zip(classes, prob))
 
-        if prob_dict.get("Negative", 0) >= 0.40:
-            sentiment = "Negative"
-        elif prob_dict.get("Positive", 0) >= 0.45:
-            sentiment = "Positive"
-        else:
-            sentiment = "Neutral"
+        # ✅ Use argmax (stable logic)
+        sentiment = classes[prob.argmax()]
 
         counts[sentiment] += 1
 
@@ -159,9 +146,9 @@ async def analyze_chat(file: UploadFile = File(...)):
     total = sum(counts.values())
 
     percentages = {
-        "Positive": round((counts["Positive"] / total) * 100, 2),
-        "Neutral": round((counts["Neutral"] / total) * 100, 2),
-        "Negative": round((counts["Negative"] / total) * 100, 2),
+        "Positive": round((counts["Positive"] / total) * 100, 2) if total else 0,
+        "Neutral": round((counts["Neutral"] / total) * 100, 2) if total else 0,
+        "Negative": round((counts["Negative"] / total) * 100, 2) if total else 0
     }
 
     health_score = max(

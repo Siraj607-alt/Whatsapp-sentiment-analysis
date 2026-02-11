@@ -1,14 +1,21 @@
 import re
 import pickle
+import chardet
+import unicodedata
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 import nltk
 
+# ===================================
+# DOWNLOAD NLTK DATA (RENDER SAFE)
+# ===================================
 nltk.download("stopwords")
 
+# ===================================
 # LOAD MODEL
+# ===================================
 model = pickle.load(open("sentiment_logistic.pkl", "rb"))
 vectorizer = pickle.load(open("tfidf_logistic.pkl", "rb"))
 
@@ -17,7 +24,9 @@ stemmer = PorterStemmer()
 
 app = FastAPI(title="WhatsApp Sentiment Analysis API")
 
-# CORS (for frontend later)
+# ===================================
+# CORS
+# ===================================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,7 +35,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ===================================
 # CLEAN TEXT
+# ===================================
 def clean_text(text):
     text = text.lower()
     text = re.sub(r"http\S+", "", text)
@@ -35,6 +46,9 @@ def clean_text(text):
     words = [stemmer.stem(w) for w in words if w not in stop_words]
     return " ".join(words)
 
+# ===================================
+# FIXED WHATSAPP EXTRACTOR
+# ===================================
 def extract_whatsapp_messages(lines):
     messages = []
 
@@ -45,6 +59,7 @@ def extract_whatsapp_messages(lines):
         "you deleted this message",
     )
 
+    # ✅ Correct regex for WhatsApp format
     pattern = re.compile(r"^\[?.*?\]?\s?-?\s?.*?:\s(.*)$")
 
     for line in lines:
@@ -71,21 +86,21 @@ def extract_whatsapp_messages(lines):
 
     return messages
 
-
+# ===================================
+# HOME ROUTE
+# ===================================
 @app.get("/")
 def home():
     return {"message": "WhatsApp Sentiment Analysis API is running"}
 
-from fastapi import UploadFile, File
-import chardet
-import unicodedata
-
+# ===================================
+# ANALYZE CHAT
+# ===================================
 @app.post("/analyze")
 async def analyze_chat(file: UploadFile = File(...)):
-    # 🔹 Read raw bytes
     raw = await file.read()
 
-    # 🔹 Detect encoding (Android = UTF-16, iOS = UTF-8)
+    # Detect encoding
     detected = chardet.detect(raw)
     encoding = detected.get("encoding") or "utf-8"
 
@@ -94,23 +109,19 @@ async def analyze_chat(file: UploadFile = File(...)):
     except Exception:
         text = raw.decode("utf-8", errors="ignore")
 
-    # 🔹 Normalize unicode (Android fix)
+    # Normalize unicode
     text = unicodedata.normalize("NFKC", text)
     text = text.replace("\u202f", " ").replace("\u00a0", " ")
 
     lines = text.splitlines()
-    
-
-    # 🔹 Extract messages (your existing logic)
     messages = extract_whatsapp_messages(lines)
-    
 
     if not messages:
         return {
             "error": "No valid WhatsApp messages found. Please upload a valid chat export."
         }
 
-    # 🔹 Clean + Vectorize
+    # Clean + Vectorize
     clean_msgs = [clean_text(m) for m in messages]
     vectors = vectorizer.transform(clean_msgs)
 
@@ -122,6 +133,8 @@ async def analyze_chat(file: UploadFile = File(...)):
 
     for msg, prob in zip(messages, probs):
         prob_dict = dict(zip(classes, prob))
+
+        # DEBUG PRINTS (OPTIONAL)
         print("MESSAGE:", msg)
         print("PROBS:", prob_dict)
         print("--------------")
@@ -129,11 +142,11 @@ async def analyze_chat(file: UploadFile = File(...)):
         positive_score = prob_dict.get("Positive", 0)
         neutral_score = prob_dict.get("Neutral", 0)
 
-# SMART POSITIVE BOOST
+        # SMART POSITIVE BOOST
         if positive_score > neutral_score * 0.75:
             sentiment = "Positive"
         else:
-             sentiment = classes[prob.argmax()]
+            sentiment = classes[prob.argmax()]
 
         counts[sentiment] += 1
 
@@ -143,17 +156,17 @@ async def analyze_chat(file: UploadFile = File(...)):
             "confidence": round(prob_dict.get(sentiment, max(prob)), 2)
         })
 
-    # ✅ TOTAL MESSAGES
+    # ===================================
+    # SUMMARY
+    # ===================================
     total = sum(counts.values())
 
-    # ✅ SENTIMENT PERCENTAGES
     percentages = {
         "Positive": round((counts["Positive"] / total) * 100, 2) if total else 0,
         "Neutral": round((counts["Neutral"] / total) * 100, 2) if total else 0,
         "Negative": round((counts["Negative"] / total) * 100, 2) if total else 0
     }
 
-    # ✅ CHAT HEALTH SCORE (0–100)
     health_score = max(
         0,
         min(
@@ -166,7 +179,6 @@ async def analyze_chat(file: UploadFile = File(...)):
         )
     )
 
-    # ✅ TOP 3 NEGATIVE MESSAGES
     top_negative = sorted(
         [r for r in results if r["sentiment"] == "Negative"],
         key=lambda x: x["confidence"],
