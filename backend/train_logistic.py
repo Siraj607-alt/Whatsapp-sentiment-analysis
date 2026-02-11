@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 
 # LOAD DATA
-df = pd.read_csv("whatsapp_sentiment_final.csv")
+df = pd.read_csv("../whatsapp_sentiment_final.csv")
 
 # CLEAN EMPTY ROWS
 df = df.dropna(subset=["clean_message"])

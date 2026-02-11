@@ -45,6 +45,8 @@ def extract_whatsapp_messages(lines):
         "you deleted this message",
     )
 
+    pattern = re.compile(r"^\[?.*?\]?\s?-?\s?.*?:\s(.*)$")
+
     for line in lines:
         line = line.strip()
         if not line:
@@ -54,21 +56,21 @@ def extract_whatsapp_messages(lines):
         if any(p in lower for p in SYSTEM_PHRASES):
             continue
 
-        # WhatsApp message = everything after FIRST colon
-        if ":" not in line:
-            continue
+        match = pattern.match(line)
 
-        message = line.split(":", 1)[1].strip()
+        if match:
+            message = match.group(1).strip()
 
-        if not message:
-            continue
+            if len(message) < 2:
+                continue
 
-        if "<media omitted>" in message.lower():
-            continue
+            if "<media omitted>" in message.lower():
+                continue
 
-        messages.append(message)
+            messages.append(message)
 
     return messages
+
 
 @app.get("/")
 def home():
@@ -120,13 +122,18 @@ async def analyze_chat(file: UploadFile = File(...)):
 
     for msg, prob in zip(messages, probs):
         prob_dict = dict(zip(classes, prob))
+        print("MESSAGE:", msg)
+        print("PROBS:", prob_dict)
+        print("--------------")
 
-        if prob_dict.get("Negative", 0) >= 0.40:
-            sentiment = "Negative"
-        elif prob_dict.get("Positive", 0) >= 0.45:
+        positive_score = prob_dict.get("Positive", 0)
+        neutral_score = prob_dict.get("Neutral", 0)
+
+# SMART POSITIVE BOOST
+        if positive_score > neutral_score * 0.75:
             sentiment = "Positive"
         else:
-            sentiment = "Neutral"
+             sentiment = classes[prob.argmax()]
 
         counts[sentiment] += 1
 
