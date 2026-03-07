@@ -14,14 +14,7 @@ export default function AnalyzerSection() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(""); // ✅ NEW
 
-  const API_URL = "https://whatsapp-sentiment-analysis-65t5.onrender.com/analyze";
-  const getMoodColor = (mood) => {
-    if (mood === "Positive") return "#4CAF50";
-    if (mood === "Negative") return "#F44336";
-    return "#FFC107";
-  };
-  
-
+  const API_URL = "https://whatsapp-sentiment-analysis-2.onrender.com/analyze";
   const analyzeChat = async () => {
     if (!file) {
       setErrorMsg("Please upload a WhatsApp .txt file");
@@ -96,27 +89,37 @@ export default function AnalyzerSection() {
       {/* ✅ RENDER RESULTS ONLY IF VALID */}
       {result && result.sentiment_counts && (
         <>
-         <h3 className="mood">
-  Overall Mood:
-  <span
-    className="mood-badge"
-    style={{ backgroundColor: getMoodColor(result.overall_mood) + "22", 
-             color: getMoodColor(result.overall_mood) }}
-  >
-    <img
-      src={
-        result.overall_mood === "Positive"
-          ? positiveSvg
-          : result.overall_mood === "Negative"
-          ? negativeSvg
-          : neutralSvg
-      }
-      alt={result.overall_mood}
-      className="mood-icon"
-    />
-    {result.overall_mood}
-  </span>
-</h3>
+       <div className="mood-meter-section">
+  <h3 className="meter-title">Overall Chat Mood</h3>
+
+  <div className="mood-meter">
+    <div className="meter-track">
+      <div className="meter-segment negative">Negative</div>
+      <div className="meter-segment neutral">Neutral</div>
+      <div className="meter-segment positive">Positive</div>
+    </div>
+
+    {/* 🔻 PROFESSIONAL POINTER */}
+    <div className={`meter-pointer ${result.overall_mood.toLowerCase()}`}>
+      <div className="pointer-arrow"></div>
+
+      <div className="pointer-label">
+        <img
+          src={
+            result.overall_mood === "Positive"
+              ? positiveSvg
+              : result.overall_mood === "Negative"
+              ? negativeSvg
+              : neutralSvg
+          }
+          alt="mood"
+        />
+        <span>{result.overall_mood}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 {result.health_score !== undefined && (
   <div className="health-section">

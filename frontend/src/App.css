@@ -1,3 +1,149 @@
+/* ===============================
+   📱 MOBILE OPTIMIZATION (SAFE)
+   =============================== */
+   @media (max-width: 768px) {
+
+    /* Global spacing fix */
+    section {
+      padding: 50px 20px;
+    }
+  
+    body {
+      overflow-x: hidden;
+    }
+  
+    /* ABOUT SECTION */
+    .about-section {
+      padding-top: 40px;
+    }
+    /* ===== NEURAL AI GLOW BACKGROUND ===== */
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(79,124,255,0.18), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(120,160,255,0.14), transparent 45%),
+    radial-gradient(circle at 40% 80%, rgba(150,180,255,0.12), transparent 50%);
+  filter: blur(80px);
+  animation: neuralMove 18s ease-in-out infinite alternate;
+}
+
+@keyframes neuralMove {
+  0% { transform: translateY(0px) scale(1); }
+  100% { transform: translateY(-60px) scale(1.05); }
+}
+
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #4f7cff, #8faeff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .about-features {
+      display: flex;              /* override desktop flex safely */
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      margin-top: 35px;
+    }
+  
+    .feature-card {
+      width: 100%;
+      max-width: 340px;
+      padding: 24px;
+    }
+  
+    .feature-card img {
+      width: 90px;
+    }
+  
+    /* ANALYZER SECTION */
+    .analyzer-section {
+      padding-bottom: 80px;
+    }
+  
+    /* Upload card */
+    .upload-card {
+      width: 100%;
+      max-width: 100%;
+      margin: 20px auto;
+    }
+  
+    .upload-content {
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .upload-title {
+      font-size: 15px;
+    }
+  
+    .upload-sub {
+      font-size: 13px;
+    }
+  
+    /* Sentiment cards */
+    .sentiment-cards {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+  
+    .sentiment-card {
+      width: 100%;
+      max-width: 300px;
+    }
+  
+    /* Mood badge */
+    .mood {
+      font-size: 18px;
+    }
+  
+    .mood-badge {
+      margin-top: 10px;
+      display: inline-flex;
+    }
+  
+    /* Health score */
+    .health-section {
+      margin: 40px auto;
+    }
+  
+    .health-chart {
+      width: 180px;
+    }
+  
+    /* Negative messages */
+    .negative-section {
+      margin-top: 40px;
+      padding: 20px;
+    }
+  
+    .negative-title {
+      font-size: 18px;
+    }
+  
+    .negative-item {
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+  
+    /* Footer */
+    .footer {
+      padding: 25px 15px;
+      font-size: 13px;
+    }
+  
+    .footer-sub {
+      font-size: 12px;
+    }
+  }
+  
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
@@ -386,4 +532,237 @@ button {
     font-size: 14px;
   }
 }
+/* 🎯 Overall Mood Meter */
+/* 🔻 Downward Arrow */
+.pointer-arrow {
+  width: 0;
+  height: 0;
+  margin: 4px auto 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 10px solid #333;
+}
+.meter-pointer.negative .pointer-arrow {
+  border-bottom-color: #f44336;
+}
+
+.meter-pointer.neutral .pointer-arrow {
+  border-bottom-color: #ffb300;
+}
+
+.meter-pointer.positive .pointer-arrow {
+  border-bottom-color: #4caf50;
+}
+.pointer-label {
+  margin-bottom: 4px;
+}
+/* 🏷 Label below arrow */
+.pointer-label {
+  margin-top: 6px;
+  background: #ffffff;
+  padding: 6px 12px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pointer-label img {
+  width: 18px;
+  height: 18px;
+}
+.meter-pointer.negative {
+  left: 16.6%;
+}
+
+.meter-pointer.neutral {
+  left: 50%;
+}
+
+.meter-pointer.positive {
+  left: 83.3%;
+}
+/* 📱 Mobile refinement */
+@media (max-width: 768px) {
+  .meter-pointer {
+    top: -34px;
+  }
+
+  .pointer-label {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+}
+.mood-meter-section {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.meter-title {
+  font-size: 20px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.mood-meter {
+  position: relative;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.meter-track {
+  display: flex;
+  height: 48px;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+.meter-segment {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.meter-segment.negative {
+  background: #f44336;
+}
+
+.meter-segment.neutral {
+  background: #ffb300;
+}
+
+.meter-segment.positive {
+  background: #4caf50;
+}
+
+/* 🚀 Indicator */
+.meter-indicator {
+  position: absolute;
+  top: -22px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  font-weight: 600;
+  font-size: 14px;
+  transition: left 0.6s ease;
+}
+
+.meter-indicator img {
+  width: 20px;
+}
+
+/* Indicator positions */
+.meter-indicator.negative {
+  left: 16.6%;
+}
+
+.meter-indicator.neutral {
+  left: 50%;
+}
+
+.meter-indicator.positive {
+  left: 83.3%;
+}
+
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .meter-track {
+    height: 42px;
+  }
+
+  .meter-segment {
+    font-size: 12px;
+  }
+
+  .meter-indicator {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+}
+.app-wrapper {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Bubble container */
+.background-bubbles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;       /* 🔴 keeps bubbles behind content */
+  overflow: hidden;
+}
+
+/* Bubble base style */
+.background-bubbles span {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: rgba(79, 124, 255, 0.12);
+  backdrop-filter: blur(40px);
+  animation: floatBubble 20s linear infinite;
+}
+
+/* Individual bubbles (size + position) */
+.background-bubbles span:nth-child(1) {
+  width: 220px;
+  height: 220px;
+  left: 10%;
+  animation-duration: 22s;
+}
+
+.background-bubbles span:nth-child(2) {
+  width: 160px;
+  height: 160px;
+  left: 70%;
+  top: 200px;
+  animation-duration: 18s;
+}
+
+.background-bubbles span:nth-child(3) {
+  width: 300px;
+  height: 300px;
+  left: 40%;
+  top: 500px;
+  animation-duration: 26s;
+}
+
+.background-bubbles span:nth-child(4) {
+  width: 140px;
+  height: 140px;
+  left: 85%;
+  top: 700px;
+  animation-duration: 20s;
+}
+
+/* Floating animation */
+@keyframes floatBubble {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-80px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+
 
